@@ -10,23 +10,30 @@ class POD:
         "c-trace": "viscosity",
         "mesh_coor2": "mesh"}
 
-    def __init__(self, fom, eps=1e-6):
+    def __init__(self, fom, centering = True, eps=1e-6):
         self.fom = fom
         self.eps = eps
+        self.centering = centering
         self.data = {}
 
     def compute_basis(self):
         for field, name in self.FIELDS.items():
             train = getattr(self.fom, f"{name}_train", None)
-
-            basis, sigma, _ = np.linalg.svd(train.T, full_matrices=False)
+            if self.centering:
+                lifting = np.mean(train, axis=0)
+            else:
+                lifting = np.zeros(train.shape[1])
+            
+            train_centered = train - lifting
+            basis, sigma, _ = np.linalg.svd(train_centered.T, full_matrices=False)
 
             nmodes = max(1, np.sum(sigma / sigma[0] >= self.eps))
 
             self.data[field] = {
                 "basis": basis[:, :nmodes],
+                "lifting": lifting,
                 "svals": sigma / sigma[0],
-                "coeffs_train": train @ basis[:, :nmodes],
+                "coeffs_train": train_centered @ basis[:, :nmodes],
                 "nmodes": nmodes,
             }
 

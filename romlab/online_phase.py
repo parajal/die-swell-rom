@@ -32,7 +32,7 @@ class OnlinePhase:
             # sklearn drops the mode axis when there is a single mode
             coeffs = np.reshape(coeffs, (len(X), -1))
             std = np.broadcast_to(np.reshape(std, (len(X), -1)), coeffs.shape).copy()
-            pred = coeffs @ self.pod.data[fld]["basis"].T
+            pred = coeffs @ self.pod.data[fld]["basis"].T + + self.pod.data[fld]["lifting"]
 
             truth = getattr(self.fom, f"{self.pod.FIELDS[fld]}_test")
             rel = (np.linalg.norm(pred - truth, axis=1) / np.linalg.norm(truth, axis=1)

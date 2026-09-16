@@ -13,7 +13,6 @@ class FOM:
         self.data_folder = data_folder
         self.docker_folder = docker_folder
         self.mesh_file = mesh_file
-
         (self.velocity_train, self.viscosity_train,
          self.mesh_train, self.parameters_train) = self._load_snapshots(data_folder, filenames_train)
         (self.velocity_test, self.viscosity_test,
