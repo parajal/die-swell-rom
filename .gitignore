@@ -6,12 +6,6 @@ __pycache__/
 .venv/
 venv/
 
-# Compiled Fortran solver executables (rebuild from source; they bloat history)
-data/extrudate_swell_b_2d/extrudate
-data/extrudate_swell_b_2d/extrudate_test
-data/extrudate_swell_b_2d/extrudate_swell2d_c
-data/extrudate_swell_b_2d/extrudate_swell2d_c_test
-data/extrudate_swell_b_2d/extrudate_swell2d_conv
 *.o
 *.mod
 
