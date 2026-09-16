@@ -5,44 +5,19 @@ import numpy as np
 class POD:
     """Compute POD bases and coefficients from snapshots."""
 
-    FIELDS = {
-        "velocity": "velocity",
-        "c-trace": "viscosity",
-        "mesh_coor2": "mesh"}
-
-    def __init__(self, fom, centering = True, eps=1e-6):
-        self.fom = fom
-        self.eps = eps
-        self.centering = centering
+    def __init__(self, fom, centering=True, eps=1e-6):
+        self.fom, self.centering, self.eps = fom, centering, eps
         self.data = {}
 
     def compute_basis(self):
-        for field, name in self.FIELDS.items():
-            train = getattr(self.fom, f"{name}_train", None)
-            if self.centering:
-                lifting = np.mean(train, axis=0)
-            else:
-                lifting = np.zeros(train.shape[1])
-            
-            train_centered = train - lifting
-            basis, sigma, _ = np.linalg.svd(train_centered.T, full_matrices=False)
-
-            nmodes = max(1, np.sum(sigma / sigma[0] >= self.eps))
-
-            self.data[field] = {
-                "basis": basis[:, :nmodes],
-                "lifting": lifting,
-                "svals": sigma / sigma[0],
-                "coeffs_train": train_centered @ basis[:, :nmodes],
-                "nmodes": nmodes,
-            }
-
-        self.computed_fields = list(self.data.keys())
-
-        if "velocity" in self.data:
-            self.degfd_vel = self.data["velocity"]["basis"].shape[0]
-
-        return self
+        for field, train in self.fom.train.items():
+            lifting = train.mean(axis=0) * self.centering
+            X = train - lifting
+            U, s, _ = np.linalg.svd(X.T, full_matrices=False)
+            n = max(1, int(np.sum(s / s[0] >= self.eps)))
+            self.data[field] = dict(basis=U[:, :n], lifting=lifting, svals=s/s[0],
+                                    coeffs_train=X @ U[:, :n], nmodes=n)
+        self.computed_fields = list(self.data)
 
     def info(self):
         for field, d in self.data.items():
