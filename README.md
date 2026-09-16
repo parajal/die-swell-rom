@@ -5,36 +5,11 @@
 `die-swell-rom` builds fast, data-driven surrogates of viscoelastic free-surface
 flows. It compresses high-fidelity simulation snapshots with **Proper Orthogonal
 Decomposition (POD)** and learns the map from physical parameters to the reduced
-coordinates with **Gaussian Process Regression (GPR)**. The reduced model is
-*non-intrusive*: it never touches the full-order solver — it only sees the
-snapshots the solver produced. Given a new set of parameters, it predicts the
-velocity field, the polymer stress (trace of the conformation tensor), and the
-shape of the swollen extrudate in a fraction of a second, together with a
-GPR uncertainty estimate.
-
-```
-                          OFFLINE (train once)                         ONLINE (per query)
-   ┌────────────┐     ┌────────────┐     ┌─────────────┐          ┌──────────────────┐
-   │ FOM        │     │ POD        │     │ GPR          │          │ new parameters μ*│
-   │ snapshots  │ ──▶ │ SVD basis  │ ──▶ │ μ → â(μ)     │   ──▶    │        │         │
-   │ + params μ │     │ + coeffs â │     │ (one per     │          │        ▼         │
-   └────────────┘     └────────────┘     │  field)      │          │ â(μ*) = GPR(μ*)  │
-                                         └─────────────┘          │ u ≈ Φ â + ū      │
-                                                                  │ + rel. error/std │
-                                                                  └──────────────────┘
-```
+coordinates with **Gaussian Process Regression (GPR)**. Given a new set of parameters, 
+it predicts the velocity field, the polymer stress (trace of the conformation tensor), 
+and the shape of the swollen extrudate in a fraction of a second.
 
 ---
-
-## Why extrudate swell?
-
-When a viscoelastic polymer melt is pushed through a die and exits into free
-space, elastic stresses stored in the flow relax and the jet **swells** — its
-cross-section grows beyond the die opening. Predicting the swollen shape and the
-stress field is expensive: it couples a nonlinear constitutive law with a moving
-free surface. This project replaces the repeated expensive solve — needed for
-design sweeps, sensitivity studies, and optimization — with a surrogate trained
-on a modest set of high-fidelity runs.
 
 Each snapshot carries three coupled fields:
 
@@ -48,23 +23,6 @@ The flows are parameterized by quantities such as the relaxation time
 $\lambda$, the viscosity ratio $\beta$, the mobility/slip $\alpha$, and (for
 unsteady cases) time $t$. Any subset of these can be selected as the *active*
 ROM inputs.
-
----
-
-## Method in one paragraph
-
-For each field, snapshots are (optionally) centered by their mean $\bar{u}$ and
-decomposed with a thin SVD, $U - \bar{u} = \Phi \Sigma V^\top$. Modes are kept
-until the normalized singular value $\sigma_i/\sigma_1$ drops below a tolerance
-`eps`, giving a basis $\Phi$ and training coefficients $\hat{a} = (U-\bar{u})\Phi$.
-In the **offline** phase, one Gaussian Process (constant × ARD-RBF kernel) is
-trained per field to regress parameters onto POD coefficients, with inputs
-min–max or standard scaled. In the **online** phase, the GPR predicts
-coefficients $\hat{a}(\mu^\*)$ for unseen parameters $\mu^\*$, and the field is
-reconstructed as $u \approx \Phi\,\hat{a}(\mu^\*) + \bar{u}$. Accuracy is
-reported as the per-snapshot relative error
-$\varepsilon = \lVert u_\text{FOM} - u_\text{ROM}\rVert / \lVert u_\text{FOM}\rVert$,
-alongside the GPR predictive standard deviation.
 
 ---
 
@@ -109,24 +67,6 @@ a `mesh.vtk` for visualization:
 | `mesh_coor2.txt` / `mesh_coor2_test.txt` | Deformed free-surface $y$-coordinates        |
 | `parameters.txt` / `parameters_test.txt` | Parameter rows, e.g. `[λ, β, α, t, Δt]`      |
 | `mesh.vtk`                             | Reference mesh for rendering fields             |
-
----
-
-## Installation
-
-Clone the repository and install the scientific-Python stack it depends on:
-
-```bash
-git clone <your-fork-url> die-swell-rom
-cd die-swell-rom
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install numpy scikit-learn matplotlib pyvista vtk jupyter ipython
-```
-
-The plotting utilities render publication-quality vector figures and assume a
-working **LaTeX** installation (`text.usetex=True` in `romlab/plots.py`). The
-core ROM pipeline (`FOM → POD → OfflinePhase → OnlinePhase`) runs without LaTeX;
-disable it in `plots.py` if you do not have a TeX distribution.
 
 ---
 
@@ -212,30 +152,3 @@ All stochastic steps are seeded so runs are deterministic. The `seed` passed to
 `FOM` (default **42**) flows through to the GPR `random_state` used for the
 kernel-optimizer restarts in `OfflinePhase`, so training the ROM twice on the
 same data yields identical models. The example notebooks all pin `seed=42`.
-
----
-
-## Extending to your own data
-
-1. Drop a new dataset folder under `data/` with the file convention above.
-2. Point `FOM(data_folder=...)` at it and set `param_cols` to your active inputs.
-3. Tune `centering` and `eps` in `POD` to trade accuracy against basis size, and
-   `x_scaler` in `OfflinePhase` for the input normalization.
-
-The mesh and the field files are optional per case — pass fewer filenames if a
-dataset has no mesh, and `FOM` will skip it.
-
----
-
-## Citation
-
-If this code supports your work, please cite it. A template entry:
-
-```bibtex
-@software{die_swell_rom,
-  title  = {die-swell-rom: Non-intrusive reduced-order modeling of viscoelastic extrudate swell},
-  author = {<Authors>},
-  year   = {2026},
-  url    = {<repository-url>}
-}
-```
