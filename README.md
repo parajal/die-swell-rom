@@ -120,15 +120,6 @@ plot = Plot(fom, online, comp_indices=[])
 plot.plot_relative_error()
 ```
 
-Predicting an entirely new parameter point is a single call:
-
-```python
-import numpy as np
-pred, std = online.reconstruct_sol(field="velocity",
-                                   X=np.array([[12.5]]),   # λ = 12.5
-                                   return_std=True)
-```
-
 ---
 
 ## The pipeline, class by class
