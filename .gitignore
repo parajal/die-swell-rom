@@ -5,15 +5,5 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
-
 *.o
 *.mod
-
-# Scratch solver output written in place by the Docker runs
-data/extrudate_swell_b_2d/params.txt
-romlab/adaptive_sampling.py
-examples/adaptive
-examples/extrudate_conv
-# OS
-.DS_Store
-Thumbs.db
