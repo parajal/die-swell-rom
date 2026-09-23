@@ -1,0 +1,40 @@
+The examples in this directory are described in the userguide.
+
+Short description
+-----------------
+
+extrudate_swell2d_c:
+
+ Viscoelastic extrudate swell problem
+ Planar flow for a differential Giesekus model
+ DEVSS-G/SUPG
+ Implicit bilinear terms of CE in momentum balance.
+ second-order Gear time integration
+ NOTE: lin_elem can be set true to use linear elements for height function
+
+extrudate_swell2d_b:
+
+ Viscoelastic extrudate swell problem
+ Planar flow for a b-representation differential Giesekus model
+ DEVSS-G/SUPG
+ Implicit bilinear terms of CE in momentum balance.
+ second-order Gear time integration
+ NOTE: lin_elem can be set true to use linear elements for height function
+
+extrudate_swell3d_c:
+
+ Viscoelastic extrudate swell problem
+ 3D flow for a differential Giesekus model
+ DEVSS-G/SUPG
+ Implicit bilinear terms of CE in momentum balance.
+ second-order Gear time integration
+ cylindrical height function to describe free surface
+
+extrudate_swell3d_b:
+
+ Viscoelastic extrudate swell problem
+ 3D flow for a b-representation differential Giesekus model
+ DEVSS-G/SUPG
+ Implicit bilinear terms of CE in momentum balance.
+ second-order Gear time integration
+ cylindrical height function to describe free surface

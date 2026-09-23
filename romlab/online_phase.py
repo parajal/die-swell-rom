@@ -2,7 +2,6 @@
 
 import numpy as np
 
-
 class OnlinePhase:
     """Predict POD coefficients, reconstruct snapshots, and compute errors."""
 

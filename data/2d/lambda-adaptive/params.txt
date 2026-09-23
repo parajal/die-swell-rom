@@ -1,0 +1,7 @@
+&comppar
+  lambda = 4.0000000000
+  betav = 0.2000000000
+  mobility = 0.2000000000
+  deltat = 0.1000000000
+  numtimesteps = 200
+/

@@ -1,0 +1,15 @@
+&comppar
+  model        = 2
+  lambda       = 1.5
+  mobility     = 0.0
+  betav        = 0.65
+  eta_0        = 1.0
+  U_avg        = 0.1
+  planar       = .false.
+  deltat       = 0.5
+  numtimesteps = 200
+  dx_box       = 0.08
+  dx_wall      = 0.04
+  dx_inlet     = 0.08
+  vtkevery     = 10
+/

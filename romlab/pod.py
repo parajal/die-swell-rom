@@ -9,12 +9,14 @@ class POD:
         self.fom, self.centering, self.eps = fom, centering, eps
         self.data = {}
 
-    def compute_basis(self):
+    def compute_basis(self, nmodes = None):
         for field, train in self.fom.train.items():
             lifting = train.mean(axis=0) * self.centering
             X = train - lifting
             U, s, _ = np.linalg.svd(X.T, full_matrices=False)
             n = max(1, int(np.sum(s / s[0] >= self.eps)))
+            if nmodes is not None:
+                n = nmodes
             self.data[field] = dict(basis=U[:, :n], lifting=lifting, svals=s/s[0],
                                     coeffs_train=X @ U[:, :n], nmodes=n)
         self.computed_fields = list(self.data)

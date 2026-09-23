@@ -22,11 +22,10 @@ class OfflinePhase:
         if self.scaler is not None:
             X = self.scaler.fit_transform(X)
 
-        kernel = ConstantKernel(1.0, (1e-6, 1e6)) * RBF(np.ones(X.shape[1]), (1e-3, 1e3))
+        kernel = ConstantKernel(1.0, (1e-6, 1e6)) * RBF(np.ones(X.shape[1]), (5e-2, 1e3))
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", ConvergenceWarning)
-            self.models = {
-                field: GaussianProcessRegressor(kernel, n_restarts_optimizer=100,
+            self.models = {field: GaussianProcessRegressor(kernel, n_restarts_optimizer=20,
                 random_state=self.fom.seed).fit(X, d["coeffs_train"])
                 for field, d in self.pod.data.items()}
 
